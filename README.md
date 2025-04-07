@@ -18,6 +18,6 @@ Si tenés dudas, sugerencias o correcciones, escribime a:
 ## 📄 Artículos disponibles
 
 - [`implicit-zero-extension.md`](./implicit-zero-extension.md)  
-  Análisis detallado del comportamiento de limpieza automática de registros al escribir valores de menor tamaño en registros generales de 64 bits (implicit zero-extension en x86-64).
+  Análisis detallado de la limpieza automática de registros parciales en x86-64. Explica cómo se comporta el procesador al escribir valores de menor tamaño en registros de 64 bits (implicit zero-extension en x86-64).
 
 ---
