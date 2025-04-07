@@ -17,7 +17,7 @@ Si tenés dudas, sugerencias o correcciones, escribime a:
 
 ## 📄 Artículos disponibles
 
-- [`implicit-zero-extension.md`](./implicit-zero-extension.md)  
+- [`implicit-zero-extension.md`](https://github.com/Pithase/linux-asm-x86-64-tech-notes/blob/main/implicit-zero-extension.md)  
   Análisis detallado del comportamiento de limpieza automática de registros al escribir valores de menor tamaño en registros generales de 64 bits (implicit zero-extension en x86-64).
 
 ---
