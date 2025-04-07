@@ -79,11 +79,11 @@ El comportamiento exacto varía según el tamaño del registro parcial modificad
 |   `RAX`    | 64 bits | No aplica (se escribe el registro completo)        |
 |   `EAX`    | 32 bits | Sí. Los bits [63:32] se ponen a cero               |
 |   `AX`     | 16 bits | No. Los bits [63:16] permanecen intactos           |
-|   `AH`     |  8 bits | No. Los bits [63:16] permanecen intactos           |
+|   `AH`     |  8 bits | No. Los bits [63:16] y [7:0] permanecen intactos           |
 |   `AL`     |  8 bits | No. Los bits [63:8]  permanecen intactos           |
 
 **Importante**
-- Al escribir en registros parciales como `AL`, `AH` o `AX`, solo se modifican porciones específicas de los 16 bits inferiores de `RAX`, dejando los bits superiores intactos:  
+- Al escribir en registros parciales como `AL`, `AH` o `AX`, solo se modifican porciones específicas de los 16 bits inferiores de `RAX`:  
      - `AL`  modifica los bits [7:0].  
      - `AH` modifica los bits [15:8].  
      - `AX` modifica los bits [15:0].
@@ -128,7 +128,7 @@ Imaginemos el siguiente escenario donde la limpieza automática no existiera:
     Este comportamiento sería extremadamente peligroso e impredecible, especialmente si se utiliza posteriormente el  en operaciones de punteros, direcciones de memoria o aritmética sensible.
 
 - **Optimización de rendimiento**:
-Sin el zero-extension implícito, los compiladores o programadores deberían insertar instrucciones adicionales (como `and rax, 0xFFFFFFFF`) para limpiar explícitamente los bits superiores. Esto implica costos en rendimiento y espacio binario.
+Sin el implicit zero-extension, los compiladores o programadores deberían insertar instrucciones adicionales (como `and rax, 0xFFFFFFFF`) para limpiar explícitamente los bits superiores. Esto implica costos en rendimiento y espacio binario.
 
 ## Mecanismo de implementación en el procesador
 
@@ -194,7 +194,7 @@ Este comportamiento puede resultar contraintuitivo inicialmente, pero tiene razo
 
 ## Evitando errores mediante la extensión explícita de registros parciales
 
-Cuando se trabaja directamente con registros parciales como `AL`, `AH` o `AX`, surge el problema potencial de conservar es no deseados en los bits superiores del registro completo, debido a que la arquitectura x86-64 no realiza la limpieza automática en estos casos. Esto puede derivar en comportamientos no definidos, errores sutiles en cálculos, punteros corruptos o incluso fallos de seguridad críticos en aplicaciones sensibles.
+Cuando se trabaja directamente con registros parciales como `AL`, `AH` o `AX`, surge el problema potencial de conservar valores no deseados en los bits superiores del registro completo, debido a que la arquitectura x86-64 no realiza la limpieza automática en estos casos. Esto puede derivar en comportamientos no definidos, errores sutiles en cálculos, punteros corruptos o incluso fallos de seguridad críticos en aplicaciones sensibles.
 
 Existen técnicas específicas recomendadas por Intel y AMD para garantizar la correcta "limpieza" o extensión segura de los bits superiores al cargar es en registros parciales:
 
@@ -202,8 +202,8 @@ Existen técnicas específicas recomendadas por Intel y AMD para garantizar la c
 La técnica más sencilla y tradicional es limpiar primero el registro completo y luego cargar el  parcial deseado:
 
 ```nasm
-xor eax, eax             ; limpia el registro `EAX` (y por ende, `RAX`) 
-mov al, [byte_data]      ; carga el byte_data de 8 bits en `AL`
+xor eax, eax             ; limpia el registro EAX (y por ende, RAX) 
+mov al, [byte_data]      ; carga el byte_data de 8 bits en AL
 ```
 
 Esto garantiza que `RAX` contendrá exactamente el valor cargado en `AL`, extendido de forma segura con ceros.
@@ -319,14 +319,14 @@ Finalmente, para cerrar este capítulo, se presentan preguntas frecuentes y acla
 **¿Por qué se utiliza xor eax, eax y no xor rax, rax?**  
 Ambas instrucciones tienen el **mismo efecto funcional**: limpian completamente el registro `RAX`. 
 Desde el punto de vista del código máquina:
-- xor eax, eax ocupa **2 bytes**.
-- xor rax, rax ocupa **3 bytes**.
+- **xor eax, eax** ocupa **2 bytes**.
+- **xor rax, rax** ocupa **3 bytes**.
 
 **¿Por qué no usar siempre movzx si es más claro?**  
 **movzx** es limpia, segura y realiza la extensión con ceros en una única instrucción, lo cual mejora la claridad y reduce el riesgo de errores.
 Desde el punto de vista del código máquina:
-- movzx eax, byte [byte_data] ocupa **3 bytes**.
-- xor eax, eax + mov al, [...] ocupa **4 bytes** (2 + 2).
+- **movzx eax, byte [byte_data]** ocupa **3 bytes**.
+- **xor eax, eax + mov al, [...]** ocupa **4 bytes** (2 + 2).
 
 Entonces, **movzx es incluso más compacto**, además de más claro.
 
