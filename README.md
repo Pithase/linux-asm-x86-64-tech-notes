@@ -20,7 +20,7 @@ Si tenés dudas, sugerencias o correcciones, escribime a:
 - [Implicit Zero-Extension en x86-64](./implicit-zero-extension.md)   
 Análisis detallado de la limpieza automática de registros parciales en x86-64. Explica cómo se comporta el procesador al escribir valores de menor tamaño en registros de 64 bits 
 
-- [Optimización de código](./optimization-code.md)   
+- [Optimización de código](./code-optimization.md)   
 Proceso iterativo de optimización de código en Ensamblador x86-64. Se parte de una rutina funcional y se aplican mejoras progresivas para reducir la cantidad de bytes e instrucciones ejecutadas, incluyendo comparativas y explicaciones didácticas sobre cada cambio aplicado.
 
 ---
